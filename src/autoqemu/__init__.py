@@ -1,6 +1,8 @@
 from pathlib import Path
 from autoqemu.dumper import connect, dump_client
+from autoqemu.run_qemu import start_proc
 import argparse
+import asyncio
 
 
 def parse_args() -> argparse.Namespace:
@@ -43,8 +45,23 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+async def _main() -> None:
     print("Hello from autoqemu!")
     args = parse_args()
-    qmp_client = connect(args.qmp_nickname, args.qmp_socket)
-    dump_client(qmp_client, args.dump_file)
+
+    with start_proc(args.kernel, args.rootfs, args.qmp_socket) as proc:
+        for line in proc.stdout:
+            if b"Welcome to jimbob88's Linux" in line:
+                print("System has started")
+
+            if b"Load average" in line:
+                print("Dumping...")
+                qmp_client = await connect(args.qmp_nickname, args.qmp_socket)
+                await dump_client(qmp_client, args.dump_file)
+                proc.kill()
+    print("Ensuring outfile is read-writable")
+    args.dump_file.chmod(0o777)
+
+
+def main() -> None:
+    asyncio.run(_main())

@@ -9,7 +9,7 @@ async def connect(nickname: str, socket: str) -> QMPClient:
 
 
 async def dump_client(client: QMPClient, out_file: Path) -> dict:
-    return client.execute(
+    return await client.execute(
         "dump-guest-memory",
-        arguments={"paging": "false", "protocol": f"file:{out_file.absolute()}"},
+        arguments={"paging": False, "protocol": f"file:{out_file.absolute()}"},
     )
