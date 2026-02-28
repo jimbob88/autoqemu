@@ -26,7 +26,7 @@ def start_proc(bz_image: Path, root_filesystem: Path, socket: str) -> Popen:
             "root=/dev/sda rw init=/init console=ttyS0 nokaslr nopti loglevel=3 oops=panic panic=-1",
             "-enable-kvm",
             "-m",
-            "4G",
+            "256M",
             "-cpu",
             "qemu64",
             "-qmp",
