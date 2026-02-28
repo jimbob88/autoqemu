@@ -10,3 +10,4 @@ wheels/
 .venv
 
 result
+memory_dump.img
