@@ -1,5 +1,5 @@
 from pathlib import Path
-from autoqemu.dumper import connect, dump_client
+from autoqemu.dumper import connect, dump_client, kill_client
 from autoqemu.run_qemu import start_proc
 import argparse
 import asyncio
@@ -55,10 +55,14 @@ async def _main() -> None:
                 print("System has started")
 
             if b"Load average" in line:
-                print("Dumping...")
+                print("Connecting to QMP")
                 qmp_client = await connect(args.qmp_nickname, args.qmp_socket)
+                print("Dumping...")
                 await dump_client(qmp_client, args.dump_file)
-                proc.kill()
+                print("Shutting down client")
+                await kill_client(qmp_client)
+                proc.terminate()
+
     if not args.dump_file.exists():
         raise FileNotFoundError("Could not find the dump file. Dump failed.")
 

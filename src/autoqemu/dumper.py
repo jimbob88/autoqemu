@@ -13,3 +13,6 @@ async def dump_client(client: QMPClient, out_file: Path) -> dict:
         "dump-guest-memory",
         arguments={"paging": False, "protocol": f"file:{out_file.absolute()}"},
     )
+
+async def kill_client(client: QMPClient) -> dict:
+    return await client.execute("system_powerdown")
