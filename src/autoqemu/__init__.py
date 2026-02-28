@@ -59,6 +59,9 @@ async def _main() -> None:
                 qmp_client = await connect(args.qmp_nickname, args.qmp_socket)
                 await dump_client(qmp_client, args.dump_file)
                 proc.kill()
+    if not args.dump_file.exists():
+        raise FileNotFoundError("Could not find the dump file. Dump failed.")
+
     print("Ensuring outfile is read-writable")
     args.dump_file.chmod(0o777)
 
